@@ -1,0 +1,52 @@
+plugins {
+    id 'java'
+    id 'io.gatling.gradle' version "3.10.4"
+}
+
+ext {
+    karateVersion = '1.2.0'
+}
+gatling {
+    // do not include classes and resources from src/main
+    includeMainOutput = false
+    // do not include classes and resources from src/test
+    includeTestOutput = false
+    logLevel = 'WARN' // logback root level
+    logHttp = 'NONE' // set to 'ALL' for all HTTP traffic in TRACE, 'FAILURES' for failed HTTP traffic in DEBUG
+
+}
+dependencies {
+    testImplementation "com.intuit.karate:karate-junit5:${karateVersion}"
+    testImplementation 'net.masterthought:cucumber-reporting:5.7.0'
+    gatling 'com.google.code.gson:gson:2.9.1' // <1>
+    gatlingImplementation 'org.apache.commons:commons-lang3:3.4' // <2>
+    gatlingRuntimeOnly 'cglib:cglib-nodep:3.2.0' // <3>
+    gatling "org.scala-lang:scala-library:2.13.9"
+    implementation group: 'com.intuit.karate', name: 'karate-testng', version: '0.8.0.1'
+
+}
+
+sourceSets {
+    test {
+        resources {
+            srcDir file('src/test/java')
+            exclude '**/*.java'
+        }
+    }
+}
+
+test {
+    useJUnitPlatform()
+    systemProperty "karate.options", System.properties.getProperty("karate.options")
+    systemProperty "karate.env", System.properties.getProperty("karate.env")
+    systemProperty "baseUrl", System.properties.getProperty("baseUrl")
+    systemProperty "user", System.properties.getProperty("user")
+    outputs.upToDateWhen { false }
+}
+
+repositories {
+    mavenCentral()
+}
+task karateDebug(type: JavaExec) {
+    classpath = sourceSets.test.runtimeClasspath
+}

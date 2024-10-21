@@ -1,0 +1,6 @@
+{
+  "nombre": "#(name)",
+  "trabajo": "#(work)",
+  "id": "#(idResponse)",
+  "createdAt": "#$.createdAt"
+}
